@@ -139,11 +139,10 @@ MempoolStatus::read_mempool()
 
         mempool_size_kB += _tx_info.blob_size;
 
-        local_copy_of_mempool_txs.push_back(mempool_tx{});
+        local_copy_of_mempool_txs.push_back(mempool_tx {tx_hash, tx});
 
         mempool_tx& last_tx = local_copy_of_mempool_txs.back();
-        last_tx.tx_hash = tx_hash;
-        last_tx.tx = tx;
+
         // key images of inputs
         vector<txin_to_key> input_key_imgs;
 
@@ -317,8 +316,8 @@ MempoolStatus::is_thread_running()
     return is_running;
 }
 
-bf::path MempoolStatus::blockchain_path {"/home/mwo/.bitmonero/lmdb"};
-string MempoolStatus::deamon_url {"http:://127.0.0.1:18081"};
+bf::path MempoolStatus::blockchain_path {"~/.triton/lmdb"};
+string MempoolStatus::deamon_url {"http:://127.0.0.1:9131"};
 cryptonote::network_type MempoolStatus::nettype {cryptonote::network_type::MAINNET};
 atomic<bool>       MempoolStatus::is_running {false};
 boost::thread      MempoolStatus::m_thread;

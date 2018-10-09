@@ -3,14 +3,14 @@ var config = {
     stagenet: false, // this is adjusted page.h if needed. dont need to change manually
     coinUnitPlaces: 12,
     txMinConfirms: 10,         // corresponds to CRYPTONOTE_DEFAULT_TX_SPENDABLE_AGE in Monero
-    txCoinbaseMinConfirms: 60, // corresponds to CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW in Monero
-    coinSymbol: 'XMR',
-    openAliasPrefix: "xmr",
-    coinName: 'Monero',
-    coinUriPrefix: 'monero:',
-    addressPrefix: 18,
-    integratedAddressPrefix: 19,
-    subAddressPrefix: 42,
+    txCoinbaseMinConfirms: 30, // corresponds to CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW in Monero
+    coinSymbol: 'XTRI',
+    openAliasPrefix: "xtri",
+    coinName: 'Triton',
+    coinUriPrefix: 'Triton:',
+    addressPrefix: 289,
+    integratedAddressPrefix: 0x629f,
+    subAddressPrefix: 0x59a0,
     addressPrefixTestnet: 53,
     integratedAddressPrefixTestnet: 54,
     subAddressPrefixTestnet: 63,
@@ -24,7 +24,7 @@ var config = {
     txChargeAddress: '',
     idleTimeout: 30,
     idleWarningDuration: 20,
-    maxBlockNumber: 500000000,
-    avgBlockTime: 120,
+    maxBlockNumber: 84000000,
+    avgBlockTime: 180,
     debugMode: false
 };
