@@ -1047,6 +1047,8 @@ decrypt(const std::string &ciphertext,
         return {};
     }
 
+    crypto::chacha_key key;
+    crypto::generate_chacha_key(&skey, key);
 
     const crypto::chacha_iv &iv = *(const crypto::chacha_iv*)&ciphertext[0];
 
