@@ -119,13 +119,13 @@ namespace std
  * visitor to produce json representations of
  * values stored in mstch::node
  */
-class mstch_node_to_json: public boost::static_visitor<nlohmann::json> {
+class mstch_node_to_json: public boost::static_visitor<nlohmann::json>
 public:
 
 
     // enabled for numeric types
     template<typename T>
-    std::enable_if_t<std::is_arithmetic<T>::value, nlohmann::json>
+    typename  std::enable_if<std::is_arithmetic<T>::value, nlohmann::json>::type
     operator()(T const& value) const {
         return nlohmann::json {value};
     }
@@ -157,7 +157,7 @@ public:
 
     // catch other types that are non-numeric and not listed above
     template<typename T>
-    std::enable_if_t<!std::is_arithmetic<T>::value, nlohmann::json>
+    typename std::enable_if<!std::is_arithmetic<T>::value, nlohmann::json>::type
     operator()(const T&) const {
         return nlohmann::json {};
     }
@@ -1690,7 +1690,7 @@ show_ringmembers_hex(string const& tx_hash_str)
 
        // make timescale maps for mixins in input
     for (txin_to_key const& in_key: input_key_imgs)
-    {      
+    {
         // get absolute offsets of mixins
         std::vector<uint64_t> absolute_offsets
                 = cryptonote::relative_output_offsets_to_absolute(
@@ -6699,4 +6699,3 @@ add_js_files(mstch::map& context)
 
 
 #endif //CROWXMR_PAGE_H
-

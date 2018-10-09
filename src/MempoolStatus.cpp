@@ -139,10 +139,11 @@ MempoolStatus::read_mempool()
 
         mempool_size_kB += _tx_info.blob_size;
 
-        local_copy_of_mempool_txs.push_back(mempool_tx {tx_hash, tx});
+        local_copy_of_mempool_txs.push_back(mempool_tx{});
 
         mempool_tx& last_tx = local_copy_of_mempool_txs.back();
-
+        last_tx.tx_hash = tx_hash;
+        last_tx.tx = tx;
         // key images of inputs
         vector<txin_to_key> input_key_imgs;
 
@@ -259,7 +260,7 @@ MempoolStatus::read_network_info()
     local_copy.outgoing_connections_count = rpc_network_info.outgoing_connections_count;
     local_copy.incoming_connections_count = rpc_network_info.incoming_connections_count;
     local_copy.white_peerlist_size        = rpc_network_info.white_peerlist_size;
-    local_copy.nettype                    = rpc_network_info.testnet ? cryptonote::network_type::TESTNET : 
+    local_copy.nettype                    = rpc_network_info.testnet ? cryptonote::network_type::TESTNET :
                                             rpc_network_info.stagenet ? cryptonote::network_type::STAGENET : cryptonote::network_type::MAINNET;
     local_copy.cumulative_difficulty      = rpc_network_info.cumulative_difficulty;
     local_copy.block_size_limit           = rpc_network_info.block_size_limit;
