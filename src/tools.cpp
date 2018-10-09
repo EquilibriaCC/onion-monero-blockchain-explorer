@@ -1046,6 +1046,9 @@ decrypt(const std::string &ciphertext,
         cerr <<  "Unexpected ciphertext size" << endl;
         return {};
     }
+
+    crypto::chacha_key key;
+
     const crypto::chacha_iv &iv = *(const crypto::chacha_iv*)&ciphertext[0];
 
     std::string plaintext;
@@ -1073,7 +1076,7 @@ decrypt(const std::string &ciphertext,
 
     crypto::chacha20(ciphertext.data() + sizeof(iv),
                     ciphertext.size() - prefix_size,
-                     iv, &plaintext[0]);
+                    key, iv, &plaintext[0]);
 
     return plaintext;
 }
