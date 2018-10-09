@@ -1073,7 +1073,7 @@ decrypt(const std::string &ciphertext,
 
     crypto::chacha20(ciphertext.data() + sizeof(iv),
                     ciphertext.size() - prefix_size,
-                    key, iv, &plaintext[0]);
+                     iv, &plaintext[0]);
 
     return plaintext;
 }
