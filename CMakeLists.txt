@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(PROJECT_NAME
-        tritonblocks)
+        e_exp)
 
 
 project(${PROJECT_NAME})
@@ -16,7 +16,7 @@ endif()
 
 
 if (NOT MONERO_DIR)
-    set(MONERO_DIR ~/triton)
+    set(MONERO_DIR ~/e)
 endif()
 
 message(STATUS MONERO_DIR ": ${MONERO_DIR}")
@@ -25,8 +25,8 @@ set(MONERO_SOURCE_DIR ${MONERO_DIR}
         CACHE PATH "Path to the root directory for Monero")
 
 # set location of monero build tree
-set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/release/
-        CACHE PATH "Path to the build directory for Monero")
+set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/Linux/release/
+        CACHE PATH "Path to the build directory for Equilibria")
 
 set(MY_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake"
         CACHE PATH "The path to the cmake directory of the current project")
