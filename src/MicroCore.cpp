@@ -21,7 +21,8 @@ namespace xmreg
  */
 MicroCore::MicroCore():
         m_mempool(m_blockchain_storage),
-        m_blockchain_storage(m_mempool)
+        m_blockchain_storage(m_mempool, m_service_node_list, m_deregister_vote_pool),
+        m_service_node_list(m_blockchain_storage)
 {
     m_device = &hw::get_device("default");
 }

@@ -9,10 +9,10 @@
 #define BLOCKCHAIN_DB DB_LMDB
 
 
-#define UNSIGNED_TX_PREFIX "Triton unsigned tx set\003"
-#define SIGNED_TX_PREFIX "Triton signed tx set\003"
-#define KEY_IMAGE_EXPORT_FILE_MAGIC "Triton key image export\002"
-#define OUTPUT_EXPORT_FILE_MAGIC "Triton output export\003"
+#define UNSIGNED_TX_PREFIX "Equilibria unsigned tx set\003"
+#define SIGNED_TX_PREFIX "Equilibria signed tx set\003"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "Equilibria key image export\002"
+#define OUTPUT_EXPORT_FILE_MAGIC "Equilibria output export\003"
 
 #define FEE_ESTIMATE_GRACE_BLOCKS 10 // estimate fee valid for that many blocks
 
@@ -23,6 +23,8 @@
 
 #include "cryptonote_core/tx_pool.h"
 #include "cryptonote_core/blockchain.h"
+#include "cryptonote_core/service_node_list.h"
+#include "cryptonote_core/service_node_deregister.h"
 #include "blockchain_db/lmdb/db_lmdb.h"
 #include "device/device_default.hpp"
 
