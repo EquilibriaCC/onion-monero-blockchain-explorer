@@ -402,7 +402,7 @@ rpccalls::get_block(string const& blk_hash, block& blk, string& error_msg)
 }
 
 bool
-rpccalls::get_service_node_list_state(COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response &res, const std::vector<std::string> &pubkeys)
+rpccalls::get_service_node(COMMAND_RPC_GET_SERVICE_NODES::response &res, const std::vector<std::string> &pubkeys)
 {
     std::lock_guard<std::mutex> guard(m_daemon_rpc_mutex);
 
@@ -413,12 +413,12 @@ rpccalls::get_service_node_list_state(COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::r
         return result;
     }
 
-    epee::json_rpc::request<COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::request> request;
-    epee::json_rpc::response<COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response, std::string> response;
+    epee::json_rpc::request<COMMAND_RPC_GET_SERVICE_NODES::request> request;
+    epee::json_rpc::response<COMMAND_RPC_GET_SERVICE_NODES::response, std::string> response;
     request.params.service_node_pubkeys = pubkeys;
     request.jsonrpc = "2.0";
     request.id      = epee::serialization::storage_entry(0);
-    request.method  = "get_service_node_list_state";
+    request.method  = "get_service_nodes";
 
     result = epee::net_utils::invoke_http_json("/json_rpc", request, response, m_http_client, timeout_time_ms);
 

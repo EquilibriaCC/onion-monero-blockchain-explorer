@@ -491,7 +491,13 @@ public:
 
     }
 
-    void generate_service_node_mapping(mstch::array *array, bool on_homepage, std::vector<COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry *> const *entries)
+    int portions_to_percent(int portions)
+    {
+        int result = (int)(((portions / (float)STAKING_PORTIONS) * 100.0f) + 0.5f);
+        return result;
+    }
+
+    void generate_service_node_mapping(mstch::array *array, bool on_homepage, std::vector<COMMAND_RPC_GET_SERVICE_NODES::response::entry *> const *entries)
     {
         static std::string num_contributors_str;
         num_contributors_str.reserve(8);
@@ -505,13 +511,13 @@ public:
 
         for (size_t i = 0; i < iterate_count; ++i, num_contributors_str.clear())
         {
-            COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry const *entry = (*entries)[i];
+            COMMAND_RPC_GET_SERVICE_NODES::response::entry const *entry = (*entries)[i];
             num_contributors_str += std::to_string(entry->contributors.size());
             num_contributors_str += "/";
             num_contributors_str += std::to_string(MAX_NUMBER_OF_CONTRIBUTORS);
 
             uint64_t contribution_remaining = entry->staking_requirement - entry->total_reserved;
-            int operator_cut_in_percent = (int)(((entry->portions_for_operator / STAKING_PORTIONS) * 100.0f) + 0.5f);
+        int operator_cut_in_percent = portions_to_percent(entry->portions_for_operator);
 
             mstch::map array_entry
             {
@@ -538,8 +544,8 @@ public:
     {
         bool on_homepage = !add_header_and_footer;
 
-        COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response response;
-        if (!rpc.get_service_node_list_state(response, {}))
+        COMMAND_RPC_GET_SERVICE_NODES::response response;
+        if (!rpc.get_service_node(response, {}))
         {
           return (on_homepage) ? m_snode_context.html_context : m_snode_context.html_full_context;
         }
@@ -552,8 +558,8 @@ public:
         page_context.emplace(awaiting_array_id, mstch::array());
 
         // Split and sort the entries
-        std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry *> unregistered;
-        std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry *> registered;
+        std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry *> unregistered;
+        std::vector<cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry *> registered;
         {
             registered.reserve  (response.service_node_states.size());
             unregistered.reserve(response.service_node_states.size() * 0.5f);
@@ -571,7 +577,7 @@ public:
             }
 
             std::sort(unregistered.begin(), unregistered.end(),
-                [](const cryptonote::COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry *a, const cryptonote::COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry *b) {
+                [](const cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry *a, const cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry *b) {
                 uint64_t a_remaining = a->staking_requirement - a->total_reserved;
                 uint64_t b_remaining = b->staking_requirement - b->total_reserved;
 
@@ -582,7 +588,7 @@ public:
             });
 
             std::stable_sort(registered.begin(), registered.end(),
-                [](const cryptonote::COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry *a, const cryptonote::COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry *b) {
+                [](const cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry *a, const cryptonote::COMMAND_RPC_GET_SERVICE_NODES::response::entry *b) {
                 if (a->last_reward_block_height == b->last_reward_block_height)
                   return a->last_reward_transaction_index < b->last_reward_transaction_index;
 
@@ -1446,8 +1452,8 @@ public:
     string
     show_service_node(const std::string &service_node_pubkey)
     {
-        COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response response;
-        if (!rpc.get_service_node_list_state(response, {service_node_pubkey}))
+        COMMAND_RPC_GET_SERVICE_NODES::response response;
+        if (!rpc.get_service_node(response, {service_node_pubkey}))
         {
           cerr << "Failed to rpc with daemon " << service_node_pubkey << endl;
           return std::string("Failed to rpc with daemon " + service_node_pubkey);
@@ -1461,7 +1467,7 @@ public:
         }
 
         mstch::map page_context {};
-        COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::entry const *entry = &response.service_node_states[0];
+        COMMAND_RPC_GET_SERVICE_NODES::response::entry const *entry = &response.service_node_states[0];
 
         // Make metadata render data
         static std::string friendly_uptime_proof_not_received = "Not Received";
@@ -1482,7 +1488,7 @@ public:
         char const service_node_contributors_array_id[] = "service_node_contributors_array";
         page_context.emplace(service_node_contributors_array_id, mstch::array{});
         mstch::array& contributors = boost::get<mstch::array>(page_context[service_node_contributors_array_id]);
-        for (COMMAND_RPC_GET_SERVICE_NODE_LIST_STATE::response::contribution const &contributor : entry->contributors)
+        for (COMMAND_RPC_GET_SERVICE_NODES::response::contribution const &contributor : entry->contributors)
         {
           mstch::map array_entry
           {
@@ -5854,6 +5860,89 @@ private:
                 {"from_cache"            , false},
                 {"construction_time"     , string {}},
         };
+
+        if (tx.version == transaction::version_3_per_output_unlock_times)
+        {
+            tx_extra_service_node_deregister deregister;
+            tx_extra_service_node_register   register_;
+            if (tx.is_deregister_tx())
+            {
+                context["have_deregister_info"] = true;
+                if (get_service_node_deregister_from_tx_extra(tx.extra, deregister))
+                {
+                  context["deregister_service_node_index"]   = deregister.service_node_index;
+                  context["deregister_block_height"]         = deregister.block_height;
+
+                  char const vote_array_id[] = "deregister_vote_array";
+                  context.emplace(vote_array_id, mstch::array());
+
+                  mstch::array& vote_array = boost::get<mstch::array>(context[vote_array_id]);
+                  vote_array.reserve(deregister.votes.size());
+
+                  for (tx_extra_service_node_deregister::vote &vote : deregister.votes)
+                  {
+                    mstch::map entry
+                    {
+                      {"deregister_voters_quorum_index", vote.voters_quorum_index},
+                      {"deregister_signature",           pod_to_hex(vote.signature)},
+                    };
+
+                    vote_array.push_back(entry);
+                  }
+                }
+                else
+                {
+                  static std::string unknown = "??";
+                  context["deregister_service_node_index"] = unknown;
+                  context["deregister_block_height"]       = unknown;
+                }
+            }
+            else if (get_service_node_register_from_tx_extra(tx.extra, register_))
+            {
+
+                     // TODO(doyle): We should add a url for jumping to the node,
+                // maybe. We only have information about the current state of
+                // the network, so previous expired nodes no longer can be
+                // accessed. This needs the store to db functionality.
+                crypto::public_key snode_key;
+                if (get_service_node_pubkey_from_tx_extra(tx.extra, snode_key))
+                {
+                  context["register_service_node_pubkey"] = pod_to_hex(snode_key);
+                }
+                else
+                {
+                  static std::string parsing_error = "<pubkey parsing error>";
+                  context["register_service_node_pubkey"] = parsing_error;
+                }
+                context["have_register_info"]             = true;
+                context["register_portions_for_operator"] = portions_to_percent(register_.m_portions_for_operator);
+                context["register_expiration_timestamp_friendly"]  = timestamp_to_str_gm(register_.m_expiration_timestamp);
+                context["register_expiration_timestamp"]  = register_.m_expiration_timestamp;
+                context["register_signature"]             = pod_to_hex(register_.m_service_node_signature);
+
+                char const array_id[] = "register_array";
+                context.emplace(array_id, mstch::array());
+
+                mstch::array& array = boost::get<mstch::array>(context[array_id]);
+                array.reserve(register_.m_public_spend_keys.size());
+
+                for (size_t i = 0; i < register_.m_public_spend_keys.size(); ++i)
+                {
+                  crypto::public_key const &spend_key = register_.m_public_spend_keys[i];
+                  crypto::public_key const &view_key =  register_.m_public_view_keys[i];
+                  uint32_t portion = register_.m_portions[i];
+
+                  mstch::map entry
+                  {
+                    {"register_spend_key", pod_to_hex(spend_key)},
+                    {"register_view_key", pod_to_hex(view_key)},
+                    {"register_portions", portions_to_percent(portion)},
+                  };
+
+                  array.push_back(entry);
+                }
+            }
+        }
 
         // append tx_json as in raw format to html
         context["tx_json_raw"] = mstch::lambda{[=](const std::string& text) -> mstch::node {
