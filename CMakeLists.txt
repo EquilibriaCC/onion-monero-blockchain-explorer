@@ -25,7 +25,7 @@ set(MONERO_SOURCE_DIR ${MONERO_DIR}
         CACHE PATH "Path to the root directory for Monero")
 
 # set location of monero build tree
-set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/Linux/release/
+set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/Linux/master/release/
         CACHE PATH "Path to the build directory for Equilibria")
 
 set(MY_CMAKE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake"
