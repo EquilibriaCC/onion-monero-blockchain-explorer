@@ -38,6 +38,8 @@ namespace xmreg
         network_type nettype;
 
     public:
+        service_nodes::service_node_list m_service_node_list;
+        
         MicroCore();
 
         bool
