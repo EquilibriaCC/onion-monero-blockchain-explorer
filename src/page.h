@@ -1332,7 +1332,7 @@ public:
         }
 
         // get block size in bytes
-        uint64_t blk_size = core_storage->get_db().get_block_size(_blk_height);
+        uint64_t blk_size = core_storage->get_db().get_block_weight(block_height);
 
         // miner reward tx
         transaction coinbase_tx = blk.miner_tx;
@@ -4552,7 +4552,7 @@ public:
 
 
         // get block size in bytes
-        uint64_t blk_size = core_storage->get_db().get_block_size(block_height);
+        uint64_t blk_size = core_storage->get_db().get_block_weight(block_height);
 
         // miner reward tx
         transaction coinbase_tx = blk.miner_tx;
@@ -4780,10 +4780,13 @@ public:
                 return j_response;
             }
 
-            // get block size in bytes
-            double blk_size = core_storage->get_db().get_block_size(i);
+            crypto::hash blk_hash = core_storage->get_block_id_by_height(i);
+
+                // get block size in bytes
+            double blk_size = core_storage->get_db().get_block_weight(i);
 
             crypto::hash blk_hash = core_storage->get_block_id_by_height(i);
+
 
             // get block age
             pair<string, string> age = get_age(local_copy_server_timestamp, blk.timestamp);
