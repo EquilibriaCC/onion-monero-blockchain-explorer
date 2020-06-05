@@ -1296,4 +1296,35 @@ get_human_readable_timestamp(uint64_t ts, std::string *result)
     strftime(buf, sizeof(buf), "%Y-%m-%d %I:%M:%S", &tm);
     *result = buf;
 }
+
+char const *get_human_time_ago(time_t t, time_t now)
+{
+    if (t == now)
+      return "now";
+
+    static char buf[128];
+    buf[0] = 0;
+
+    char *buf_ptr       = buf;
+    char const *buf_end = buf + sizeof(buf);
+    time_t dt           = t > now ? t - now : now - t;
+
+    if (t > now)
+    {
+      buf_ptr += snprintf(buf_ptr, buf_ptr - buf_end, "in ");
+    }
+
+    if (dt < 90)             buf_ptr += snprintf(buf_ptr, buf_ptr - buf_end, "%zu seconds", dt);
+    else if (dt < 90 * 60)   buf_ptr += snprintf(buf_ptr, buf_ptr - buf_end, "%zu minutes", dt/60);
+    else if (dt < 36 * 3600) buf_ptr += snprintf(buf_ptr, buf_ptr - buf_end, "%zu hours", dt/3600);
+    else                     buf_ptr += snprintf(buf_ptr, buf_ptr - buf_end, "%zu days", dt/(3600*24));
+
+    if (t < now)
+    {
+      buf_ptr += snprintf(buf_ptr, buf_ptr - buf_end, " ago");
+    }
+
+    return buf;
+}
+
 }

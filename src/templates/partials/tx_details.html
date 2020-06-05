@@ -87,20 +87,18 @@
       <div class="TitleDivider"></div>
       <p>Service Node Public Key: {{register_service_node_pubkey}}</p>
       <p>Portions For Operator: {{register_portions_for_operator}}%</p>
-      <p>Expiration Timestamp: {{register_expiration_timestamp_friendly}} ({{register_expiration_timestamp}})</p>
+      <p>Expiration Timestamp: {{register_expiration_timestamp_friendly}} ({{register_expiration_timestamp}}) or {{register_expiration_timestamp_relative}}</p>
       <p>Signature: {{register_signature}}</p>
 
       <table class="Table">
           <tr class="TableHeader">
-              <td>Public Spend Key</td>
-              <td>Public View Key</td>
+              <td>Address</td>
               <td>Portions</td>
           </tr>
 
           {{#register_array}}
           <tr>
-              <td>{{register_spend_key}}</td>
-              <td>{{register_view_key}}</td>
+              <td>{{register_address}}</td>
               <td>{{register_portions}}%</td>
           </tr>
           {{/register_array}}

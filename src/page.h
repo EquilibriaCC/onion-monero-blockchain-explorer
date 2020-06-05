@@ -491,18 +491,27 @@ public:
 
     }
 
-    int portions_to_percent(int portions)
+    int portions_to_percent(uint64_t portions)
     {
-        int result = (int)(((portions / (float)STAKING_PORTIONS) * 100.0f) + 0.5f);
+        int result = (int)(((portions / (double)STAKING_PORTIONS) * 100.0) + 0.5);
         return result;
     }
+     time_t calculate_service_node_expiry_timestamp(uint64_t registration_height)
+    {
+        uint64_t curr_height   = core_storage->get_current_blockchain_height();
+        uint64_t expiry_height = registration_height;
+        expiry_height += (nettype == cryptonote::TESTNET) ? STAKING_REQUIREMENT_LOCK_BLOCKS_TESTNET : STAKING_REQUIREMENT_LOCK_BLOCKS;
 
+        int64_t delta_height = expiry_height - curr_height;
+        time_t result = time(nullptr) + (delta_height * DIFFICULTY_TARGET_V2);
+    }
     void generate_service_node_mapping(mstch::array *array, bool on_homepage, std::vector<COMMAND_RPC_GET_SERVICE_NODES::response::entry *> const *entries)
     {
         static std::string num_contributors_str;
         num_contributors_str.reserve(8);
 
         static std::string friendly_uptime_proof_not_received = "Not Received";
+        static std::string end_of_queue = "End Of Queue";
 
         size_t iterate_count = on_homepage ? m_snode_context.num_entries_on_front_page : entries->size();
         iterate_count        = std::min(entries->size(), iterate_count);
@@ -517,19 +526,26 @@ public:
             num_contributors_str += std::to_string(MAX_NUMBER_OF_CONTRIBUTORS);
 
             uint64_t contribution_remaining = entry->staking_requirement - entry->total_reserved;
-        int operator_cut_in_percent = portions_to_percent(entry->portions_for_operator);
+            int operator_cut_in_percent = portions_to_percent(entry->portions_for_operator);
 
+            // Calculate the estimated expiration time
+            static std::string expiration_time_str;
+            time_t expiry_time = calculate_service_node_expiry_timestamp(entry->registration_height);
+            expiration_time_str.clear();
+            get_human_readable_timestamp(expiry_time, &expiration_time_str);
             mstch::map array_entry
             {
               {"public_key",                    entry->service_node_pubkey},
               {"num_contributors",              num_contributors_str},
               {"operator_cut",                  operator_cut_in_percent},
               {"open_for_contribution",         print_money(contribution_remaining)},
-              {"total_contributed",             print_money(entry->total_contributed)},
-              {"total_reserved",                print_money(entry->total_reserved)},
+              {"contributed",                   print_money(entry->total_contributed)},
+              {"reserved",                      print_money(entry->total_reserved)},
               {"staking_requirement",           print_money(entry->staking_requirement)},
               {"last_reward_at_block",          entry->last_reward_block_height},
-              {"last_reward_at_block_tx_index", entry->last_reward_transaction_index},
+              {"last_reward_at_block_tx_index", (entry->last_reward_transaction_index == UINT32_MAX) ? end_of_queue : std::to_string(entry->last_reward_transaction_index)},
+              {"expiration_date",               expiration_time_str},
+              {"expiration_time_relative",      std::string(get_human_time_ago(expiry_time, time(nullptr)))},
               {"last_uptime_proof",             (entry->last_uptime_proof == 0) ? friendly_uptime_proof_not_received : get_age(server_timestamp, entry->last_uptime_proof).first},
             };
             array->push_back(array_entry);
@@ -1483,6 +1499,7 @@ public:
         page_context["operator_address"]     = entry->operator_address;
         page_context["last_uptime_proof"]    = (entry->last_uptime_proof == 0) ? friendly_uptime_proof_not_received : get_age(server_timestamp, entry->last_uptime_proof).first;
         page_context["num_contributors"]     = entry->contributors.size();
+        page_context["register_height"]      = entry->registration_height;
 
         // Make contributor render data
         char const service_node_contributors_array_id[] = "service_node_contributors_array";
@@ -1503,8 +1520,17 @@ public:
         char const service_node_registered_text_id[] = "service_node_registered_text";
         if (entry->total_contributed == entry->staking_requirement)
         {
-          page_context[service_node_registered_text_id] = std::string("This service node is registered and active on the network");
-        }
+            time_t expiry_time = calculate_service_node_expiry_timestamp(entry->registration_height);
+            std::string str = "This service node is registered and active on the network and expires on the ";
+
+            std::string expiry_friendly_timestamp;
+            get_human_readable_timestamp(expiry_time, &expiry_friendly_timestamp);
+            str += expiry_friendly_timestamp;
+
+            str += " or ";
+            str += get_human_time_ago(expiry_time, time(nullptr));
+
+            page_context[service_node_registered_text_id] = str;        }
         else
         {
           char buf[192];
@@ -5917,6 +5943,7 @@ private:
                 context["have_register_info"]             = true;
                 context["register_portions_for_operator"] = portions_to_percent(register_.m_portions_for_operator);
                 context["register_expiration_timestamp_friendly"]  = timestamp_to_str_gm(register_.m_expiration_timestamp);
+                context["register_expiration_timestamp_relative"]  = get_human_time_ago(register_.m_expiration_timestamp, time(nullptr));
                 context["register_expiration_timestamp"]  = register_.m_expiration_timestamp;
                 context["register_signature"]             = pod_to_hex(register_.m_service_node_signature);
 
@@ -5932,10 +5959,13 @@ private:
                   crypto::public_key const &view_key =  register_.m_public_view_keys[i];
                   uint32_t portion = register_.m_portions[i];
 
+                  account_public_address address = {};
+                  address.m_spend_public_key     = spend_key;
+                  address.m_view_public_key      = view_key;
+
                   mstch::map entry
                   {
-                    {"register_spend_key", pod_to_hex(spend_key)},
-                    {"register_view_key", pod_to_hex(view_key)},
+                    {"register_address", get_account_address_as_str(nettype, false /*is_subaddress*/, address)},
                     {"register_portions", portions_to_percent(portion)},
                   };
 
