@@ -749,7 +749,7 @@ public:
             crypto::hash blk_hash = core_storage->get_block_id_by_height(i);
 
             // get block size in kB
-            double blk_size = static_cast<double>(core_storage->get_db().get_block_size(i))/1024.0;
+           double blk_size = static_cast<double>(core_storage->get_db().get_block_weight(i))/1024.0;
 
             string blk_size_str = fmt::format("{:0.2f}", blk_size);
 
@@ -4780,10 +4780,10 @@ public:
                 return j_response;
             }
 
-            crypto::hash blk_hash = core_storage->get_block_id_by_height(i);
-
                 // get block size in bytes
             double blk_size = core_storage->get_db().get_block_weight(i);
+
+            crypto::hash blk_hash = core_storage->get_block_id_by_height(i);
 
             // get block age
             pair<string, string> age = get_age(local_copy_server_timestamp, blk.timestamp);
