@@ -320,6 +320,7 @@ atomic<MempoolStatus::network_info> MempoolStatus::current_network_info;
 atomic<uint64_t> MempoolStatus::mempool_no {0};   // no of txs
 atomic<uint64_t> MempoolStatus::mempool_size {0}; // size in bytes.
 uint64_t MempoolStatus::mempool_refresh_time {10};
+mutex MempoolStatus::mempool_mutx;
 MempoolStatus::service_node_state MempoolStatus::node_state = {};
 
 }
