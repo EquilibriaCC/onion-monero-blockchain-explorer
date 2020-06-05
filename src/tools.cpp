@@ -1047,7 +1047,7 @@ decrypt(const std::string &ciphertext,
     }
 
     crypto::chacha_key key;
-    crypto::generate_chacha_key(std::string((const char*)&password, sizeof(password)), chacha_key, 1);
+    crypto::generate_chacha_key(&skey, sizeof(skey), key, 1);
     const crypto::chacha_iv &iv = *(const crypto::chacha_iv*)&ciphertext[0];
 
     std::string plaintext;

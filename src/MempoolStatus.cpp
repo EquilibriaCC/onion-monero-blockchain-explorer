@@ -229,14 +229,6 @@ MempoolStatus::read_network_info()
 
     string error_msg;
 
-    if (!rpc.get_dynamic_per_kb_fee_estimate(
-            FEE_ESTIMATE_GRACE_BLOCKS,
-            fee_estimated, error_msg))
-    {
-        cerr << "rpc.get_dynamic_per_kb_fee_estimate failed" << endl;
-        return false;
-    }
-
     (void) error_msg;
 
     COMMAND_RPC_HARD_FORK_INFO::response rpc_hardfork_info;
