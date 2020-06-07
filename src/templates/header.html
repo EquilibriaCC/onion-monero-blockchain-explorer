@@ -17,7 +17,7 @@
     {{#refresh}}
         <meta http-equiv="refresh" content="10">
     {{/refresh}}
-    <title>Triton Blockchain Explorer</title>
+    <title>Equilibria Explorer</title>
     <!--<link rel="stylesheet" type="text/css" href="/css/style.css">-->
     <style type="text/css">
         {{#css_styles}}{{/css_styles}}
@@ -45,19 +45,6 @@
 	  <li class="pure-menu-item"><a href="/rawoutputkeys" class="pure-menu-link">Output keys checker</a></li>
 	  <li class="pure-menu-item"><a href="/api" class="pure-menu-link">API</a></li>
 	</ul>
-      </div>
-
-      <div class="search">
-        <form action="/search" method="get" style="width: 100%; margin-top:15px;" class="style-1">
-            <input type="text" name="value"
-                   placeholder="block height, block hash, transaction hash">
-            <input type="submit" value="Search" class="pure-button pure-button-active">
-        </form>
-        <form action="/search_service_node" method="get" style="width: 100%; margin-top:15px; margin-bottom: 1em;" class="style-1">
-          <input type="text" name="value" size="120"
-                 placeholder="Service Node Public Key">
-          <input type="submit" class="PageButton" value="Search">
-      </form>
       </div>
 
     </header>
