@@ -484,7 +484,7 @@ int portions_to_percent(uint64_t portions)
         expiry_height += (nettype == cryptonote::TESTNET) ? STAKING_REQUIREMENT_LOCK_BLOCKS_TESTNET : STAKING_REQUIREMENT_LOCK_BLOCKS;
 
         int64_t delta_height = expiry_height - curr_height;
-        time_t result = time(nullptr) + (delta_height * DIFFICULTY_TARGET_V2);
+        time_t result = time(nullptr) + (delta_height * DIFFICULTY_TARGET_V3);
     }
 void generate_service_node_mapping(mstch::array *array, bool on_homepage, std::vector<COMMAND_RPC_GET_SERVICE_NODES::response::entry *> const *entries)
    {
