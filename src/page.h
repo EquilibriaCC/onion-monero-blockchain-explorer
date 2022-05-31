@@ -974,7 +974,6 @@ index2(uint64_t page_no = 0, bool refresh_page = false)
 			{"staking_requirement", print_money(current_network_info.staking_requirement)},
             {"staking_requirement_1", print_money(current_network_info.staking_requirement / 10)},
 			{"staking_requirement_2", print_money(current_network_info.staking_requirement / 1000)},
-
             {"current_hf_version", current_network_info.current_hf_version},
             {"age"               , network_info_age.first},
             {"age_format"        , network_info_age.second},
@@ -5962,16 +5961,14 @@ construct_tx_context(transaction tx, uint16_t with_ring_signatures = 0)
     }
 
     tx_extra_service_node_pubkey sn_key; 
-    if(get_service_node_pubkey_from_tx_extra(tx.extra, sn_key))
+    if(get_service_node_pubkey_from_tx_extra(tx.extra, sn_key.m_service_node_key))
     {
         context["sn_key"] = pod_to_hex(sn_key.m_service_node_key);
     }
 
     tx_extra_service_node_winner winner; 
-    if(get_service_node_winner_from_tx_extra(tx.extra, winner))
-    {
-        context["service_node_winner"] = pod_to_hex(winner.m_service_node_key);
-    }
+     context["service_node_winner"] = pod_to_hex(get_service_node_winner_from_tx_extra(tx.extra));
+    
 
     if (tx.version == transaction::version_3_per_output_unlock_times)
             {
