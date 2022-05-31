@@ -506,7 +506,6 @@ void generate_service_node_mapping(mstch::array *array, bool on_homepage, std::v
            num_contributors_str += std::to_string(75);
 
            uint64_t contribution_remaining = entry->staking_requirement - entry->total_reserved;
-           int operator_cut_in_percent = portions_to_percent(entry->portions_for_operator);
 
            // Calculate the estimated expiration time
            static std::string expiration_time_str;
@@ -518,7 +517,6 @@ void generate_service_node_mapping(mstch::array *array, bool on_homepage, std::v
            {
              {"public_key",                    entry->service_node_pubkey},
              {"num_contributors",              num_contributors_str},
-             {"operator_cut",                  operator_cut_in_percent},
              {"open_for_contribution",         print_money(contribution_remaining)},
              {"contributed",                   print_money(entry->total_contributed)},
              {"reserved",                      print_money(entry->total_reserved)},
@@ -974,8 +972,8 @@ index2(uint64_t page_no = 0, bool refresh_page = false)
             {"is_current_info"   , current_network_info.current},
             {"is_pool_size_zero" , (current_network_info.tx_pool_size == 0)},
 			{"staking_requirement", print_money(current_network_info.staking_requirement)},
-            {"staking_requirement_1", print_money(current_network_info.staking_requirement / 4)},
-			{"staking_requirement_2", print_money(current_network_info.staking_requirement / 100)},
+            {"staking_requirement_1", print_money(current_network_info.staking_requirement / 10)},
+			{"staking_requirement_2", print_money(current_network_info.staking_requirement / 1000)},
 
             {"current_hf_version", current_network_info.current_hf_version},
             {"age"               , network_info_age.first},
@@ -1463,7 +1461,6 @@ string
 
        // Make metadata render data
        static std::string friendly_uptime_proof_not_received = "Not Received";
-       int operator_cut_in_percent = (int)(((entry->portions_for_operator / STAKING_PORTIONS) * 100.0f) + 0.5f);
 
        page_context["public_key"]           = entry->service_node_pubkey;
        page_context["last_reward_at_block"] = entry->last_reward_block_height;
@@ -1471,7 +1468,6 @@ string
        page_context["total_contributed"]    = print_money(entry->total_contributed);
        page_context["total_reserved"]       = print_money(entry->total_reserved);
        page_context["staking_requirement"]  = print_money(entry->staking_requirement);
-       page_context["operator_cut"]         = operator_cut_in_percent;
        page_context["operator_address"]     = entry->operator_address;
        page_context["operator_address"]     = entry->operator_address;
        page_context["last_uptime_proof"]    = (entry->last_uptime_proof == 0) ? friendly_uptime_proof_not_received : get_age(server_timestamp, entry->last_uptime_proof).first;
