@@ -14,7 +14,7 @@ endif()
 
 
 if (NOT MONERO_DIR)
-    set(MONERO_DIR ~/e)
+    set(MONERO_DIR ~/equilibria)
 endif()
 
 message(STATUS MONERO_DIR ": ${MONERO_DIR}")
@@ -26,7 +26,7 @@ endif()
 
 if (NOT MONERO_BUILD_DIR)
     # set location of monero build tree
-    set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/Linux/master/release/
+    set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/release/
           CACHE PATH "Path to the build directory for Monero")
 endif()
 
@@ -117,7 +117,6 @@ set(LIBRARIES
         multisig
         daemonizer
         cncrypto
-        blocks
         lmdb
         ringct
         ringct_basic
