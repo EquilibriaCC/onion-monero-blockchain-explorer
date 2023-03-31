@@ -1,22 +1,22 @@
 <br>
 <div class="row justify-content-center align-items-center">
 	<div class="w-50">
-		<form class="form" action="/search" method="get">
-	    <input type="text" name="value" class="form-control"
-		   placeholder="Block Height, Block Hash, Transaction Hash">
-	</form>
+		<form class="form" action="/search" method="get" id="multi_form">
+	        <input type="text" name="value" class="form-control"
+		        placeholder="Block Height, Block Hash, Transaction Hash">
+	    </form>
 	</div>
-      <button type="submit" class="btn btn-success">Search</button>
+    <button type="submit" class="btn btn-success" form="multi_form">Search</button>
 </div>
 <br>
 <div class="row justify-content-center align-items-center">
 	<div class="w-50">
-		<form class="form" action="/search_service_node" method="get">
-		<input type="text" name="value" class="form-control"
-		   placeholder="Service Node Public Key">
-	</form>
+		<form class="form" action="/search_service_node" method="get" id="snode_form">
+            <input type="text" name="value" class="form-control"
+            placeholder="Service Node Public Key">
+	    </form>
 	</div>
-	<button type="submit" class="btn btn-success">Search</button>
+	<button type="submit" class="btn btn-success" form="snode_form">Search</button>
 </div>
 
 <div class="text-center">
