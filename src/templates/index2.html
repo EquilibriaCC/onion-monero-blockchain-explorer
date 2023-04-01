@@ -3,7 +3,7 @@
 	<div class="w-50">
 		<form class="form" action="/search" method="get" id="multi_form">
 	        <input type="text" name="value" class="form-control"
-		        placeholder="Block Height, Block Hash, Transaction Hash">
+		        placeholder="Block Height, Block Hash, Transaction Hash" required>
 	    </form>
 	</div>
     <button type="submit" class="btn btn-success" form="multi_form">Search</button>
@@ -13,7 +13,7 @@
 	<div class="w-50">
 		<form class="form" action="/search_service_node" method="get" id="snode_form">
             <input type="text" name="value" class="form-control"
-            placeholder="Service Node Public Key">
+            placeholder="Service Node Public Key" required>
 	    </form>
 	</div>
 	<button type="submit" class="btn btn-success" form="snode_form">Search</button>
