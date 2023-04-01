@@ -73,6 +73,7 @@ To run it:
 ```
 
 Equilibria Blockchain Explorer:
+```
   -h [ --help ] [=arg(=1)] (=0)         produce help message
   -t [ --testnet ] [=arg(=1)] (=0)      use testnet blockchain
   -s [ --stagenet ] [=arg(=1)] (=0)     use stagenet blockchain
@@ -144,31 +145,36 @@ disabled. To enable it use `--enable-emission-monitor` flag, e.g.,
 xmrblocks --enable-emission-monitor
 ```
 
-This flag will enable emission monitoring thread. When started, the thread
- will initially scan the entire blockchain, and calculate the cumulative emission based on each block.
-Since it is a separate thread, the explorer will work as usual during this time.
-Every 10000 blocks, the thread will save current emission in a file, by default,
- in `~/.bitmonero/lmdb/emission_amount.txt`. For testnet or stagenet networks,
- it is `~/.bitmonero/testnet/lmdb/emission_amount.txt` or `~/.bitmonero/stagenet/lmdb/emission_amount.txt`. This file is used so that we don't
- need to rescan entire blockchain whenever the explorer is restarted. When the
- explorer restarts, the thread will first check if `~/.bitmonero/lmdb/emission_amount.txt`
- is present, read its values, and continue from there if possible. Subsequently, only the initial
- use of the tread is time consuming. Once the thread scans the entire blockchain, it updates
- the emission amount using new blocks as they come. Since the explorer writes this file, there can
- be only one instance of it running for mainnet, testnet and stagenet. Thus, for example, you cant have
- two explorers for mainnet
- running at the same time, as they will be trying to write and read the same file at the same time,
- leading to unexpected results. Off course having one instance for mainnet and one instance for testnet
- is fine, as they write to different files.
+This flag will enable emission monitoring thread. When started, the thread will initially scan the entire blockchain, and calculate the cumulative emission based on each block.
 
- When the emission monitor is enabled, information about current emission of coinbase and fees is
- displayed on the front page, e.g., :
+Since it is a separate thread, the explorer will work as usual during this time.
+
+Every 10000 blocks, the thread will save current emission in a file, by default,
+
+ in `~/.bitmonero/lmdb/emission_amount.txt`. For testnet or stagenet networks,
+
+ it is `~/.bitmonero/testnet/lmdb/emission_amount.txt` or `~/.bitmonero/stagenet/lmdb/emission_amount.txt`. 
+ 
+ This file is used so that we don't need to rescan entire blockchain whenever the explorer is restarted.
+
+ When the explorer restarts, the thread will first check if `~/.bitmonero/lmdb/emission_amount.txt` is present, read its values, and continue from there if possible.
+ 
+ Subsequently, only the initial use of the tread is time consuming. Once the thread scans the entire blockchain, it updates the emission amount using new blocks as they come.
+ 
+ Since the explorer writes this file, there can be only one instance of it running for mainnet, testnet and stagenet.
+ 
+ Thus, for example, you cant have two explorers for mainnet running at the same time, as they will be trying to write and read the same file at the same time, leading to unexpected results.
+ 
+ Off course having one instance for mainnet and one instance for testnet is fine, as they write to different files.
+
+ When the emission monitor is enabled, information about current emission of coinbase and fees is displayed on the front page, e.g., :
 
 ```
 Monero emission (fees) is 14485540.430 (52545.373) as of 1313448 block
 ```
 
 The values given, can be checked using Monero daemon's  `print_coinbase_tx_sum` command.
+
 For example, for the above example: `print_coinbase_tx_sum 0 1313449`.
 
 To disable the monitor, simply restart the explorer without `--enable-emission-monitor` flag.
@@ -192,13 +198,12 @@ Having the `crt` and `key` files, run `xmrblocks` in the following way:
 ./xmrblocks --ssl-crt-file=/tmp/server.crt --ssl-key-file=/tmp/server.key
 ```
 
-Note: Because we generated our own certificate, modern browsers will complain
-about it as they cant verify the signatures against any third party. So probably
-for any practical use need to have properly issued ssl certificates.
+Note: Because we generated our own certificate, modern browsers will complain about it as they cant verify the signatures against any third party. So probably for any practical use need to have properly issued ssl certificates.
 
 ## JSON API
 
 The explorer has JSON api. For the API, it uses conventions defined by [JSend](https://labs.omniti.com/labs/jsend).
+
 By default the api is disabled. To enable it, use `--enable-json-api` flag, e.g.,
 
 ```
@@ -405,8 +410,7 @@ Partial results shown:
 }
 ```
 
-Limit of 100000000 is just default value above to ensure that all mempool txs are fetched
-if no specific limit given.
+Limit of 100000000 is just default value above to ensure that all mempool txs are fetched if no specific limit given.
 
 #### api/mempool?limit=<no_of_top_txs>
 
@@ -461,8 +465,11 @@ Partial results shown:
 #### api/outputs?txhash=<tx_hash>&address=<address>&viewkey=<viewkey>&txprove=<0|1>
 
 For `txprove=0` we check which outputs belong to given address and corresponding viewkey.
+
 For `txprove=1` we use to prove to the recipient that we sent them founds.
-For this, we use recipient's address and our tx private key as a viewkey value,
+
+For this, we use recipient's address and our tx private key as a viewkey value.
+
  i.e., `viewkey=<tx_private_key>`
 
 Checking outputs:
@@ -501,6 +508,7 @@ curl  -w "\n" -X GET "http://127.0.0.1:8081/api/outputs?txhash=17049bc5f2d9fbca1
 Proving transfer:
 
 We use recipient's address (i.e. not our address from which we sent xmr to recipient).
+
 For the viewkey, we use `tx_private_key` (although the GET variable is still called `viewkey`) that we obtained by sending this txs.
 
 ```bash
@@ -657,14 +665,14 @@ curl  -w "\n" -X GET "http://127.0.0.1:8081/api/version"
     "git_branch_name": "update_to_current_monero",
     "last_git_commit_date": "2017-07-25",
     "last_git_commit_hash": "a549f25",
-    "monero_version_full": "0.10.3.1-ab594cfe"
+    "XEQ_VERSION_FULL": "0.10.3.1-ab594cfe"
   },
   "status": "success"
 }
 ```
 
-api number is store as `uint32_t`. In this case `65536` represents
-major version 1 and minor version 0.
+api number is store as `uint32_t`. In this case `65536` represents major version 1 and minor version 0.
+
 In JavaScript to get these numbers, one can do as follows:
 
 ```javascript

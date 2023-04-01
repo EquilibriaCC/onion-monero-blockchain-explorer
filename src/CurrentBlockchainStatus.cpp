@@ -137,13 +137,16 @@ CurrentBlockchainStatus::calculate_emission_in_blocks(
 
         uint64_t coinbase_amount = get_outs_money_amount(blk.miner_tx);
 
-        uint64_t dev_fund = 400000000000;
-
         if (start_blk == 991430)
         {
-          coinbase_amount -= dev_fund;
+          coinbase_amount -= (uint64_t)0x5d21dba000;
         }
 
+        if (start_blk == 1056414)
+        {
+          coinbase_amount -= (uint64_t)0xba43b74000;
+        }
+        
         vector<transaction> txs;
         vector<crypto::hash> missed_txs;
 

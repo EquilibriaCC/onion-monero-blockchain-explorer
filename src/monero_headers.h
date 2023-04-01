@@ -5,14 +5,14 @@
 #ifndef XMREG01_MONERO_HEADERS_H_H
 #define XMREG01_MONERO_HEADERS_H_H
 
-#define DB_LMDB   2
+#define DB_LMDB   3
 #define BLOCKCHAIN_DB DB_LMDB
 
 
-#define UNSIGNED_TX_PREFIX "Triton unsigned tx set\003"
-#define SIGNED_TX_PREFIX "Triton signed tx set\003"
-#define KEY_IMAGE_EXPORT_FILE_MAGIC "Triton key image export\002"
-#define OUTPUT_EXPORT_FILE_MAGIC "Triton output export\003"
+#define UNSIGNED_TX_PREFIX "Equilibria unsigned tx set\003"
+#define SIGNED_TX_PREFIX "Equilibria signed tx set\003"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "Equilibria key image export\002"
+#define OUTPUT_EXPORT_FILE_MAGIC "Equilibria output export\003"
 
 #define FEE_ESTIMATE_GRACE_BLOCKS 10 // estimate fee valid for that many blocks
 
