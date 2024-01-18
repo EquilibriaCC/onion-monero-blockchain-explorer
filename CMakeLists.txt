@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_NAME
         e_exp)
@@ -6,7 +6,7 @@ set(PROJECT_NAME
 
 project(${PROJECT_NAME})
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -O3")
@@ -14,7 +14,7 @@ endif()
 
 
 if (NOT MONERO_DIR)
-    set(MONERO_DIR ~/xeq16)
+    set(MONERO_DIR ~/xeqv19.1)
 endif()
 
 message(STATUS MONERO_DIR ": ${MONERO_DIR}")
@@ -26,7 +26,7 @@ endif()
 
 if (NOT MONERO_BUILD_DIR)
     # set location of monero build tree
-    set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/release/
+    set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/Linux/master/release/
           CACHE PATH "Path to the build directory for Monero")
 endif()
 

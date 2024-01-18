@@ -3,6 +3,7 @@
 //
 
 #include "tools.h"
+#include "MempoolStatus.h"
 #include <codecvt>
 #include <thread>
 
@@ -609,9 +610,11 @@ sum_fees_in_txs(const vector<transaction>& txs)
 {
     uint64_t fees_sum {0};
 
+    MempoolStatus::network_info current_network_info = MempoolStatus::current_network_info;
+
     for (const transaction& tx: txs)
     {
-        fees_sum += get_tx_miner_fee(tx, true);
+        fees_sum += get_tx_miner_fee(tx, current_network_info.current_hf_version, true);
     }
 
     return fees_sum;
