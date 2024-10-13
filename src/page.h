@@ -28,8 +28,6 @@
 #include <future>
 #include <visitor/render_node.hpp>
 
-cn_gpu_hash ctx;
-
 #define TMPL_DIR                    "./templates"
 #define TMPL_PARIALS_DIR            TMPL_DIR "/partials"
 #define TMPL_CSS_STYLES             TMPL_DIR "/css/style.css"
@@ -1320,8 +1318,7 @@ show_block(uint64_t _blk_height)
                                              _blk_height, current_blockchain_height);
 
     // initalise page tempate map with basic info about blockchain
-    crypto::hash blk_pow_hash;
-    string blk_pow_hash_str = pod_to_hex(get_block_longhash(blk, blk_pow_hash, ctx));
+    string blk_pow_hash_str = pod_to_hex(get_block_longhash(core_storage, blk, _blk_height, 0));
     cryptonote::difficulty_type blk_difficulty = core_storage->get_db().get_block_difficulty(_blk_height);
 
     mstch::map context {
@@ -5550,7 +5547,7 @@ json_emission()
         j_data = json {
                 {"blk_no"  , current_values.blk_no - 1},
                 {"emission", current_values.emission},
-                {"emited"  , current_values.emission + current_values.fee},
+                {"coinbase", current_values.emission + current_values.fee},
                 {"fee"     , current_values.fee},
                 {"burn"    , current_values.burn},
         };

@@ -1,67 +1,58 @@
-# EquilibriaCC Blockchain Explorer
+# Equilibria Blockchain Explorer
 
-The key features of the Onion EquilibriaCC Blockchain Explorer are:
+The key features of the Onion Monero Blockchain Explorer are:
 
- - no cookies, no web analytics trackers, no images
- - open sourced
- - made fully in C++
- - showing encrypted payment ID
- - showing ring signatures
- - showing transaction extra field
- - showing public components of EquilibriaCC addresses
- - decoding which outputs and mixins belong to the given EquilibriaCC address and viewkey
- - detailed information about ring members, such as their age, timescale, and their ring sizes
- - showing the number of amount output indices
- - support EquilibriaCC testnet and stagnet networks
- - can provide the total amount of all miner fees
- - check oracle nodes and their status
+ - no cookies, no web analytics trackers, no images,
+ - open sourced,
+ - made fully in C++,
+ - showing encrypted payments ID,
+ - showing ring signatures,
+ - showing transaction extra field,
+ - showing public components of Equilibria addresses,
+ - decoding which outputs and mixins belong to the given Monero address and viewkey,
+ - detailed information about ring members, such as, their age, timescale and their ring sizes,
+ - showing number of amount output indices,
+ - support Equilibria testnet and stagnet networks,
+ - can provide total amount of all miner fees,
+ - check oracle nodes
 
 
-## Compilation on Ubuntu 16.04/18.04/20.04
+## Compilation on Ubuntu 16.04/18.04
 
-##### 1: Compile the latest EquilibriaCC version
+##### Compile latest Equilibria version
 
-If you have already compiled EquilibriaCC CLI binaries then move onto the explorer portion of the build. If you have built binaries in a folder other than the home folder you will need to edit the CMakeLists.txt file in the main explorer download folder to reflect your build folder. Example:
-
-```bash
-if (NOT MONERO_DIR)
-    set(MONERO_DIR ~/xeqv19.1) <-------change this to your folder location of Equilibria, usually change from ~/xeqv19.1 to /Equilibria
-endif()
-
-```
-
-Download and compile recent EquilibriaCC into your home folder:
+Download and compile recent Equilibria into your home folder:
 
 ```bash
-# First, install EquilibriaCC dependencies
-
+# first install monero dependecines
 sudo apt update
 
 sudo apt install git build-essential cmake libboost-all-dev miniupnpc libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev libcurl4-openssl-dev libgtest-dev libreadline-dev libzmq3-dev libsodium-dev libpcsclite-dev
 
-# Go to the home folder
+# go to home folder
 cd ~
 
 git clone --recursive https://github.com/EquilibriaCC/equilibria
 
-cd equilibria
+cd equilibria/
 
-git submodule init && git submodule update
+# checkout last monero version
+git checkout -b last_release v5.0.3
 
 make
 ```
 
-##### 2: Compile and run the explorer
+##### Compile and run the explorer
 
-Once the EquilibriaCC is compiled, the explorer can be downloaded and compiled
+Once the Equilibria is compiled, the explorer can be downloaded and compiled
 as follows:
 
 ```bash
-# Go to the home folder if still in ~/Equilibria
+# go to home folder if still in ~/monero
 cd ~
 
-# download the explorer source code
-git clone https://github.com/EquilibriaCC/Explorer
+# download the source code
+git clone https://github.com/Equilibria/Explorer
 
 # enter the downloaded sourced code folder
 cd Explorer
@@ -76,11 +67,9 @@ make
 ```
 
 
-To run the Explorer do the following:
-
-Start your daemon and let it fully sync then while in the /Explorer/build/ folder run:
+To run it:
 ```
-./e_exp -d http://127.0.0.1:9231 --enable-emission-monitor --enable-json-api --enable-pusher --enable-as-hex --enable-autorefresh-option
+./e_exp
 ```
 
 Equilibria Blockchain Explorer:
@@ -106,7 +95,7 @@ Equilibria Blockchain Explorer:
                                         enable users to have the index page on
                                         autorefresh
   --enable-emission-monitor [=arg(=1)] (=0)
-                                        enable Equilibria total emission monitoring
+                                        enable Monero total emission monitoring
                                         thread
   -p [ --port ] arg (=8081)             default explorer port
   --testnet-url arg                     you can specify testnet url, if you run
@@ -131,60 +120,60 @@ Equilibria Blockchain Explorer:
   --ssl-key-file arg                    path to key file for ssl (https)
                                         functionality
   -d [ --deamon-url ] arg (=http:://127.0.0.1:9231)
-                                        EquilibriaCC deamon url
+                                        Monero deamon url
 ```
 
 Example usage, defined as bash aliases.
 
 ```bash
 # for mainnet explorer
-alias xeqblocksmainnet='~/explorer/build/e_exp    --port 8081 --mainnet-url "http://192.168.1.111:8081" --enable-pusher --enable-emission-monitor'
+alias xmrblocksmainnet='~/onion-monero-blockchain-explorer/build/xmrblocks    --port 8081 --testnet-url "http://139.162.32.245:8082" --enable-pusher --enable-emission-monitor'
 
 # for testnet explorer
-alias xeqblockstestnet='~/explorer/build/e_exp -t --port 8082 --testnet-url "http://192.168.1.111:8084" --enable-pusher --enable-emission-monitor'
+alias xmrblockstestnet='~/onion-monero-blockchain-explorer/build/xmrblocks -t --port 8082 --mainnet-url "http://139.162.32.245:8081" --enable-pusher --enable-emission-monitor'
 ```
 
-These are aliases similar to those used for http://192.168.1.111:8081/ and http://192.168.1.111:8084/, respectively.
+These are aliases similar to those used for http://139.162.32.245:8081/ and http://139.162.32.245:8082/, respectively.
 
-## Enable EquilibriaCC emission
+## Enable Monero emission
 
-Obtaining the current EquilibriaCC emission amount is not straight forward. Thus, by default it is
+Obtaining current Monero emission amount is not straight forward. Thus, by default it is
 disabled. To enable it use `--enable-emission-monitor` flag, e.g.,
 
 
 ```bash
-./e_exp --enable-emission-monitor
+xmrblocks --enable-emission-monitor
 ```
 
-This flag will enable the emission monitoring thread. When started, the thread will initially scan the entire blockchain, and calculate the cumulative emission based on each block.
+This flag will enable emission monitoring thread. When started, the thread will initially scan the entire blockchain, and calculate the cumulative emission based on each block.
 
 Since it is a separate thread, the explorer will work as usual during this time.
 
-Every 10000 blocks, the thread will save the current emission in a file, by default,
+Every 10000 blocks, the thread will save current emission in a file, by default,
 
- in `~/.equilibria/lmdb/emission_amount.txt`. For testnet or stagenet networks,
+ in `~/.bitmonero/lmdb/emission_amount.txt`. For testnet or stagenet networks,
 
- it is `~/.equilibria/testnet/lmdb/emission_amount.txt` or `~/.equilibria/stagenet/lmdb/emission_amount.txt`. 
+ it is `~/.bitmonero/testnet/lmdb/emission_amount.txt` or `~/.bitmonero/stagenet/lmdb/emission_amount.txt`. 
  
  This file is used so that we don't need to rescan entire blockchain whenever the explorer is restarted.
 
- When the explorer restarts, the thread will first check if `~/.equilibria/lmdb/emission_amount.txt` is present, read its values, and continue from there if possible.
+ When the explorer restarts, the thread will first check if `~/.bitmonero/lmdb/emission_amount.txt` is present, read its values, and continue from there if possible.
  
- Subsequently, only the initial use of the tread is very time-consuming, especially on lower end hardware. Once the thread scans the entire blockchain, it updates the emission amount using new blocks as they come.
+ Subsequently, only the initial use of the tread is time consuming. Once the thread scans the entire blockchain, it updates the emission amount using new blocks as they come.
  
  Since the explorer writes this file, there can be only one instance of it running for mainnet, testnet and stagenet.
  
- Thus, for example, you can't have two explorers for mainnet running at the same time, as they will be trying to write and read the same file at the same time, leading to unexpected results.
+ Thus, for example, you cant have two explorers for mainnet running at the same time, as they will be trying to write and read the same file at the same time, leading to unexpected results.
  
- Of course, having one instance for mainnet and one instance for testnet is fine, as they write to different files.
+ Off course having one instance for mainnet and one instance for testnet is fine, as they write to different files.
 
- When the emission monitor is enabled, information about the current emission of coinbase and fees is displayed on the front page, e.g., :
+ When the emission monitor is enabled, information about current emission of coinbase and fees is displayed on the front page, e.g., :
 
 ```
-Equilibria emission (fees) is 14485540.430 (52545.373) as of 1103448 block
+Monero emission (fees) is 14485540.430 (52545.373) as of 1313448 block
 ```
 
-The values given can be checked using EquilibriaCC daemon's  `print_coinbase_tx_sum` command.
+The values given, can be checked using Monero daemon's  `print_coinbase_tx_sum` command.
 
 For example, for the above example: `print_coinbase_tx_sum 0 1313449`.
 
@@ -203,13 +192,13 @@ openssl req -new -key server.key -out server.csr
 openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt
 ```
 
-Having the `crt` and `key` files, run `./e_exp` in the following way:
+Having the `crt` and `key` files, run `xmrblocks` in the following way:
 
 ```bash
-./e_exp --ssl-crt-file=/tmp/server.crt --ssl-key-file=/tmp/server.key
+./xmrblocks --ssl-crt-file=/tmp/server.crt --ssl-key-file=/tmp/server.key
 ```
 
-Note: Because we generated our own certificate, modern browsers will complain about it as they can't verify the signatures against any third party. So probably for any practical use need to have properly issued ssl certificates.
+Note: Because we generated our own certificate, modern browsers will complain about it as they cant verify the signatures against any third party. So probably for any practical use need to have properly issued ssl certificates.
 
 ## JSON API
 
@@ -218,7 +207,7 @@ The explorer has JSON api. For the API, it uses conventions defined by [JSend](h
 By default the api is disabled. To enable it, use `--enable-json-api` flag, e.g.,
 
 ```
-./e_exp --enable-json-api
+./xmrblocks --enable-json-api
 ```
 
 #### api/transaction/<tx_hash>
@@ -518,7 +507,7 @@ curl  -w "\n" -X GET "http://127.0.0.1:8081/api/outputs?txhash=17049bc5f2d9fbca1
 
 Proving transfer:
 
-We use recipient's address (i.e. not our address from which we sent XEQ to recipient).
+We use recipient's address (i.e. not our address from which we sent xmr to recipient).
 
 For the viewkey, we use `tx_private_key` (although the GET variable is still called `viewkey`) that we obtained by sending this txs.
 
@@ -673,8 +662,8 @@ curl  -w "\n" -X GET "http://127.0.0.1:8081/api/version"
   "data": {
     "api": 65536,
     "blockchain_height": 1357031,
-    "git_branch_name": "update_to_current_Equilibria",
-    "last_git_commit_date": "2021-07-25",
+    "git_branch_name": "update_to_current_monero",
+    "last_git_commit_date": "2017-07-25",
     "last_git_commit_hash": "a549f25",
     "XEQ_VERSION_FULL": "0.10.3.1-ab594cfe"
   },
