@@ -20,13 +20,16 @@
 #include "CurrentBlockchainStatus.h"
 #include "MempoolStatus.h"
 
-#include "../ext/crow/crow.h"
+#include "../ext/crow_all.h"
+#include "../ext/json.hpp"
+#include "../ext/mstch/src/visitor/render_node.hpp"
 
 #include <algorithm>
 #include <limits>
 #include <ctime>
 #include <future>
-#include <visitor/render_node.hpp>
+#include <type_traits>
+#include <filesystem>
 
 #define TMPL_DIR                    "./templates"
 #define TMPL_PARIALS_DIR            TMPL_DIR "/partials"
@@ -1667,17 +1670,19 @@ show_block_hex(size_t block_height, bool complete_blk)
                 return string {"Failed to obtain complete block data "};
             }
 
-            std::string complete_block_data_str;
+            epee::byte_slice complete_block_data_slice;
 
             if(!epee::serialization::store_t_to_binary(
-                        complete_block_data, complete_block_data_str))
+                        complete_block_data, complete_block_data_slice))
             {
                 cerr << "Failed to serialize complete_block_data\n";
                 return string {"Failed to obtain complete block data"};
             }
 
+            std::string block_data_str(complete_block_data_slice.begin(), complete_block_data_slice.end());
+
             return epee::string_tools
-                    ::buff_to_hex_nodelimer(complete_block_data_str);
+                    ::buff_to_hex_nodelimer(block_data_str);
         }
     }
     catch (std::exception const& e)
@@ -1723,7 +1728,7 @@ show_ringmembers_hex(string const& tx_hash_str)
             if (are_absolute_offsets_good(absolute_offsets, in_key)
                     == false)
                 continue;
-		
+
           get_output_key<BlockchainDB>(in_key.amount,
                                          absolute_offsets,
                                          mixin_outputs);
@@ -2023,7 +2028,7 @@ show_my_outputs(string tx_hash_str,
     {
         cerr << "Cant get derived key for: "  << "\n"
              << "pub_tx_key: " << pub_key << " and "
-             << "prv_view_key" << prv_view_key << endl;
+             << "prv_view_key" << pod_to_hex(unwrap(unwrap(prv_view_key))) << endl;
 
         return string("Cant get key_derivation");
     }
@@ -2036,7 +2041,7 @@ show_my_outputs(string tx_hash_str,
         {
             cerr << "Cant get derived key for: "  << "\n"
                  << "pub_tx_key: " << txd.additional_pks[i] << " and "
-                 << "prv_view_key" << prv_view_key << endl;
+                 << "prv_view_key" << pod_to_hex(unwrap(unwrap(prv_view_key))) << endl;
 
             return string("Cant get key_derivation");
         }
@@ -2310,7 +2315,7 @@ show_my_outputs(string tx_hash_str,
             {
                 cerr << "Cant get derived key for: "  << "\n"
                      << "pub_tx_key: " << mixin_tx_pub_key << " and "
-                     << "prv_view_key" << prv_view_key << endl;
+                     << "prv_view_key" << pod_to_hex(unwrap(unwrap(prv_view_key))) << endl;
 
                 continue;
             }
@@ -2322,7 +2327,7 @@ show_my_outputs(string tx_hash_str,
                 {
                     cerr << "Cant get derived key for: "  << "\n"
                          << "pub_tx_key: " << mixin_additional_tx_pub_keys[i]
-                         << " and prv_view_key" << prv_view_key << endl;
+                         << " and prv_view_key" << pod_to_hex(unwrap(unwrap(prv_view_key))) << endl;
 
                     continue;
                 }
@@ -3034,7 +3039,7 @@ show_checkrawtx(string raw_tx_data, string action)
                 return boost::get<string>(tx_context["error_msg"]);
             }
 
-            tx_context["tx_prv_key"] =  fmt::format("{:s}", ptx.tx_key);
+            tx_context["tx_prv_key"] =  fmt::format("{:s}", pod_to_hex(unwrap(unwrap(ptx.tx_key))));
 
             mstch::array destination_addresses;
             vector<uint64_t> real_ammounts;
@@ -3585,7 +3590,7 @@ show_checkrawkeyimgs(string raw_data, string viewkey_str)
     context.insert({"address"        , REMOVE_HASH_BRAKETS(
             xmreg::print_address(address_info, nettype))});
     context.insert({"viewkey"        , REMOVE_HASH_BRAKETS(
-            fmt::format("{:s}", prv_view_key))});
+            fmt::format("{:s}", pod_to_hex(unwrap(unwrap(prv_view_key)))))});
     context.insert({"has_total_xmr"  , false});
     context.insert({"total_xmr"      , string{}});
     context.insert({"key_imgs"       , mstch::array{}});
@@ -3718,7 +3723,7 @@ show_checkcheckrawoutput(string raw_data, string viewkey_str)
 
     context.insert({"address"        , REMOVE_HASH_BRAKETS(
             xmreg::print_address(address_info, nettype))});
-    context.insert({"viewkey"        , pod_to_hex(prv_view_key)});
+    context.insert({"viewkey"        , pod_to_hex(unwrap(unwrap(prv_view_key)))});
     context.insert({"has_total_xmr"  , false});
     context.insert({"total_xmr"      , string{}});
     context.insert({"output_keys"    , mstch::array{}});
@@ -5278,7 +5283,7 @@ json_outputs(string tx_hash_str,
     // matches to what was used to produce response.
     j_data["tx_hash"]  = pod_to_hex(txd.hash);
     j_data["address"]  = pod_to_hex(address_info.address);
-    j_data["viewkey"]  = pod_to_hex(prv_view_key);
+    j_data["viewkey"]  = pod_to_hex(unwrap(unwrap(prv_view_key)));
     j_data["tx_prove"] = tx_prove;
 
     j_response["status"] = "success";
@@ -5460,7 +5465,7 @@ json_outputsblocks(string _limit,
     // check if submited data in the request
     // matches to what was used to produce response.
     j_data["address"]  = pod_to_hex(address_info.address);
-    j_data["viewkey"]  = pod_to_hex(prv_view_key);
+    j_data["viewkey"]  = pod_to_hex(unwrap(unwrap(prv_view_key)));
     j_data["limit"]    = _limit;
     j_data["height"]   = height;
     j_data["mempool"]  = in_mempool_aswell;

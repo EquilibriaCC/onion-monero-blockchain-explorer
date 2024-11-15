@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.10)
 set(PROJECT_NAME
         e_exp)
 
-
 project(${PROJECT_NAME})
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -O3")
@@ -43,7 +43,7 @@ include(MyUtils)
 find_package(Monero)
 
 # find boost
-find_package(Boost 1.62.0 QUIET REQUIRED COMPONENTS
+find_package(Boost COMPONENTS
         system
         filesystem
         thread
@@ -52,14 +52,16 @@ find_package(Boost 1.62.0 QUIET REQUIRED COMPONENTS
         regex
         serialization
         program_options
-        date_time)
+        date_time
+        REQUIRED)
 
 #info https://github.com/arsenm/sanitizers-cmake
 find_package(Sanitizers)
 
 if(APPLE)
-    include_directories(/usr/local/opt/openssl/include)
-    link_directories(/usr/local/opt/openssl/lib)
+    include_directories(/usr/local/opt/openssl@1.1/include)
+    link_directories(/usr/local/opt/openssl@1.1/lib)
+    link_directories(/usr/local/lib)
 endif()
 
 
@@ -78,7 +80,6 @@ include_directories(${MONERO_SOURCE_DIR}/build/Linux/master)
 
 include_directories("ext/mstch/include")
 include_directories("ext/mstch/include/src")
-include_directories("ext/crow")
 
 # add ext/ subfolder
 add_subdirectory(ext/)
@@ -115,6 +116,7 @@ set(LIBRARIES
         cryptonote_basic
         multisig
         daemonizer
+        blocks
         cncrypto
         lmdb
         ringct
