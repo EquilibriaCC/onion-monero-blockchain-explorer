@@ -30,7 +30,7 @@
 
 set(LIBS common;cryptonote_basic;cryptonote_core;multisig;
 		cryptonote_protocol;daemonizer;mnemonics;epee;lmdb;device;
-		blockchain_db;ringct;wallet;cncrypto;easylogging;version;checkpoints;hardforks)
+		blockchain_db;ringct;wallet;cncrypto;easylogging;version;checkpoints;hardforks;randomx)
 
 set(Xmr_INCLUDE_DIRS "${CPP_MONERO_DIR}")
 
@@ -44,7 +44,7 @@ foreach (l ${LIBS})
 	find_library(Xmr_${L}_LIBRARY
 		NAMES ${l}
 		PATHS ${CMAKE_LIBRARY_PATH}
-		PATH_SUFFIXES "/src/${l}" "/src/" "/external/db_drivers/lib${l}" "/lib" "/src/crypto" "/contrib/epee/src" "/external/easylogging++/"
+		PATH_SUFFIXES "/src/${l}" "/src/" "/external/db_drivers/lib${l}" "/lib" "/external/randomxeq" "/src/crypto" "/contrib/epee/src" "/external/easylogging++/" "/external/${1}"
 		NO_DEFAULT_PATH
 	)
 
@@ -65,13 +65,15 @@ if (EXISTS ${MONERO_BUILD_DIR}/src/ringct/libringct_basic.a)
 endif()
 
 
-message(STATUS ${MONERO_SOURCE_DIR}/build)
+message(STATUS ${MONERO_SOURCE_DIR}/build/Linux/master)
 
 # include monero headers
 include_directories(
 		${MONERO_SOURCE_DIR}/src
+		${MONERO_SOURCE_DIR}/src/crypto
 		${MONERO_SOURCE_DIR}/external
-		${MONERO_SOURCE_DIR}/build
+		${MONERO_SOURCE_DIR}/external/randomxeq/src
+		${MONERO_SOURCE_DIR}/build/Linux/master/release
 		${MONERO_SOURCE_DIR}/external/easylogging++
 		${MONERO_SOURCE_DIR}/contrib/epee/include
 		${MONERO_SOURCE_DIR}/external/db_drivers/liblmdb)

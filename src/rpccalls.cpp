@@ -149,10 +149,8 @@ bool
 rpccalls::get_network_info(COMMAND_RPC_GET_INFO::response& response)
 {
 
-    epee::json_rpc::request<cryptonote::COMMAND_RPC_GET_INFO::request>
-            req_t = AUTO_VAL_INIT(req_t);
-    epee::json_rpc::response<cryptonote::COMMAND_RPC_GET_INFO::response, std::string>
-            resp_t = AUTO_VAL_INIT(resp_t);
+    epee::json_rpc::request<cryptonote::COMMAND_RPC_GET_INFO::request> req_t{};
+    epee::json_rpc::response<cryptonote::COMMAND_RPC_GET_INFO::response, std::string> resp_t{};
 
     bool r {false};
 
@@ -210,8 +208,8 @@ bool
 rpccalls::get_staking_requirement(uint64_t height, COMMAND_RPC_GET_STAKING_REQUIREMENT::response& response)
 {
 
-    epee::json_rpc::request<cryptonote::COMMAND_RPC_GET_STAKING_REQUIREMENT::request> req_t = AUTO_VAL_INIT(req_t);
-    epee::json_rpc::response<cryptonote::COMMAND_RPC_GET_STAKING_REQUIREMENT::response, std::string> resp_t = AUTO_VAL_INIT(resp_t);
+    epee::json_rpc::request<cryptonote::COMMAND_RPC_GET_STAKING_REQUIREMENT::request> req_t{};
+    epee::json_rpc::response<cryptonote::COMMAND_RPC_GET_STAKING_REQUIREMENT::response, std::string> resp_t{};
 
     bool r {false};
 
@@ -267,8 +265,8 @@ rpccalls::get_staking_requirement(uint64_t height, COMMAND_RPC_GET_STAKING_REQUI
 bool
 rpccalls::get_hardfork_info(COMMAND_RPC_HARD_FORK_INFO::response& response)
 {
-    epee::json_rpc::request<cryptonote::COMMAND_RPC_HARD_FORK_INFO::request> req_t = AUTO_VAL_INIT(req_t);
-    epee::json_rpc::response<cryptonote::COMMAND_RPC_HARD_FORK_INFO::response, std::string> resp_t = AUTO_VAL_INIT(resp_t);
+    epee::json_rpc::request<cryptonote::COMMAND_RPC_HARD_FORK_INFO::request> req_t{};
+    epee::json_rpc::response<cryptonote::COMMAND_RPC_HARD_FORK_INFO::response, std::string> resp_t{};
 
 
     bool r {false};
@@ -332,10 +330,8 @@ rpccalls::get_dynamic_per_kb_fee_estimate(
         uint64_t& fee,
         string& error_msg)
 {
-    epee::json_rpc::request<COMMAND_RPC_GET_BASE_FEE_ESTIMATE::request>
-            req_t = AUTO_VAL_INIT(req_t);
-    epee::json_rpc::response<COMMAND_RPC_GET_BASE_FEE_ESTIMATE::response, std::string>
-            resp_t = AUTO_VAL_INIT(resp_t);
+    epee::json_rpc::request<COMMAND_RPC_GET_BASE_FEE_ESTIMATE::request> req_t{};
+    epee::json_rpc::response<COMMAND_RPC_GET_BASE_FEE_ESTIMATE::response, std::string> resp_t{};
 
 
     req_t.jsonrpc = "2.0";

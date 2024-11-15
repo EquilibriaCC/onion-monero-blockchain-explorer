@@ -14,7 +14,7 @@ endif()
 
 
 if (NOT MONERO_DIR)
-    set(MONERO_DIR ~/xeq17.1)
+    set(MONERO_DIR ~/xeqv2110)
 endif()
 
 message(STATUS MONERO_DIR ": ${MONERO_DIR}")
@@ -26,7 +26,7 @@ endif()
 
 if (NOT MONERO_BUILD_DIR)
     # set location of monero build tree
-    set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/Linux/master/release/
+    set(MONERO_BUILD_DIR ${MONERO_SOURCE_DIR}/build/Linux/master/release
           CACHE PATH "Path to the build directory for Monero")
 endif()
 
@@ -43,7 +43,7 @@ include(MyUtils)
 find_package(Monero)
 
 # find boost
-find_package(Boost COMPONENTS
+find_package(Boost 1.62.0 QUIET REQUIRED COMPONENTS
         system
         filesystem
         thread
@@ -52,8 +52,7 @@ find_package(Boost COMPONENTS
         regex
         serialization
         program_options
-        date_time
-        REQUIRED)
+        date_time)
 
 #info https://github.com/arsenm/sanitizers-cmake
 find_package(Sanitizers)
@@ -75,7 +74,7 @@ endif()
 include_directories(${Boost_INCLUDE_DIRS})
 
 # include monero
-include_directories(${MONERO_SOURCE_DIR}/build)
+include_directories(${MONERO_SOURCE_DIR}/build/Linux/master)
 
 include_directories("ext/mstch/include")
 include_directories("ext/mstch/include/src")
@@ -127,6 +126,7 @@ set(LIBRARIES
         checkpoints
         version
         epee
+        randomx
         hardforks
         sodium
         ${Boost_LIBRARIES}

@@ -27,21 +27,22 @@ struct CurrentBlockchainStatus
 
     struct Emission
     {
-        uint64_t coinbase;
-        uint64_t fee;
         uint64_t blk_no;
+        uint64_t emission;
+        uint64_t fee;
+        uint64_t burn;
 
         inline uint64_t
         checksum() const
         {
-            return coinbase + fee + blk_no;
+            return blk_no + emission + fee + burn;
         }
 
         operator
         std::string() const
         {
-            return to_string(blk_no) + "," + to_string(coinbase)
-                   + "," + to_string(fee) + "," + to_string(checksum());
+            return to_string(blk_no) + "," + to_string(emission)
+                   + "," + to_string(fee) + "," + to_string(burn) + "," + to_string(checksum());
         }
     };
 

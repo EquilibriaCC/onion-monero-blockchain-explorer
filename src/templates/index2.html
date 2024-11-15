@@ -3,7 +3,7 @@
 	<div class="w-50">
 		<form class="form" action="/search" method="get" id="multi_form">
 	        <input type="text" name="value" class="form-control"
-		        placeholder="Block Height, Block Hash, Transaction Hash" required>
+		        placeholder="Block Height, Block Hash, Transaction Hash">
 	    </form>
 	</div>
     <button type="submit" class="btn btn-success" form="multi_form">Search</button>
@@ -13,7 +13,7 @@
 	<div class="w-50">
 		<form class="form" action="/search_service_node" method="get" id="snode_form">
             <input type="text" name="value" class="form-control"
-            placeholder="Service Node Public Key" required>
+            placeholder="Service Node Public Key">
 	    </form>
 	</div>
 	<button type="submit" class="btn btn-success" form="snode_form">Search</button>
@@ -79,7 +79,7 @@
 
     {{#emission}}
         <h3 style="font-size: 12px; margin-top: 2px">
-            Equilibria emission is {{amount}} as of {{blk_no}} block
+            Equilibria Circulating Supply: {{amount}} (Coinbase: {{emited}} | Fees: {{fee_amount}} | Burn: {{burn_amount}}) XEQ as of block {{blk_no}}
         </h3>
     {{/emission}}
 

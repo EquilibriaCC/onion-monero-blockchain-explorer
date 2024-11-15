@@ -28,8 +28,6 @@
 #include <future>
 #include <visitor/render_node.hpp>
 
-cn_gpu_hash ctx;
-
 #define TMPL_DIR                    "./templates"
 #define TMPL_PARIALS_DIR            TMPL_DIR "/partials"
 #define TMPL_CSS_STYLES             TMPL_DIR "/css/style.css"
@@ -247,7 +245,6 @@ struct tx_details
 
         // tx size in kB
         double tx_size =  static_cast<double>(size)/1024.0;
-
 
         if (!input_key_imgs.empty())
         {
@@ -481,7 +478,7 @@ int portions_to_percent(uint64_t portions)
     {
         uint64_t curr_height   = core_storage->get_current_blockchain_height();
         uint64_t expiry_height = registration_height;
-        expiry_height += (nettype == cryptonote::TESTNET) ? STAKING_REQUIREMENT_LOCK_BLOCKS_TESTNET : STAKING_REQUIREMENT_LOCK_BLOCKS;
+        expiry_height += service_nodes::staking_num_lock_blocks(nettype);
 
         int64_t delta_height = expiry_height - curr_height;
         time_t result = time(nullptr) + (delta_height * DIFFICULTY_TARGET_V3);
@@ -901,7 +898,7 @@ index2(uint64_t page_no = 0, bool refresh_page = false)
             txd_map.insert({"height"    , i});
             txd_map.insert({"blk_hash"  , blk_hash_str});
             txd_map.insert({"age"       , age.first});
-            txd_map.insert({"is_ringct" , (tx.version > 1)});
+            txd_map.insert({"is_ringct" , (tx.version >= cryptonote::txversion::v2)});
             txd_map.insert({"rct_type"  , tx.rct_signatures.type});
             txd_map.insert({"blk_size"  , blk_size_str});
 
@@ -1005,13 +1002,17 @@ index2(uint64_t page_no = 0, bool refresh_page = false)
                 = CurrentBlockchainStatus::get_emission();
 
         string emission_blk_no   = std::to_string(current_values.blk_no - 1);
-        string emission_coinbase = xmr_amount_to_str(current_values.coinbase, "{:0.3f}");
-        string emission_fee      = xmr_amount_to_str(current_values.fee, "{:0.3f}");
+        string emission_emission = xmr_amount_to_str(current_values.emission, "{:0.4f}");
+        string emission_fee      = xmr_amount_to_str(current_values.fee, "{:0.4f}");
+        string emission_burn     = xmr_amount_to_str(current_values.burn, "{:0.4f}");
+        string emission_sum      = xmr_amount_to_str((current_values.emission + current_values.fee), "{:0.4f}");
 
         context["emission"] = mstch::map {
                 {"blk_no"    , emission_blk_no},
-                {"amount"    , emission_coinbase},
-                {"fee_amount", emission_fee}
+                {"amount"    , emission_emission},
+                {"emited"    , emission_sum},
+                {"fee_amount", emission_fee},
+                {"burn_amount", emission_burn},
         };
     }
     else
@@ -1317,8 +1318,7 @@ show_block(uint64_t _blk_height)
                                              _blk_height, current_blockchain_height);
 
     // initalise page tempate map with basic info about blockchain
-    crypto::hash blk_pow_hash;
-    string blk_pow_hash_str = pod_to_hex(get_block_longhash(blk, blk_pow_hash, ctx));
+    string blk_pow_hash_str = pod_to_hex(get_block_longhash(core_storage, blk, _blk_height, 0));
     cryptonote::difficulty_type blk_difficulty = core_storage->get_db().get_block_difficulty(_blk_height);
 
     mstch::map context {
@@ -2099,7 +2099,7 @@ show_my_outputs(string tx_hash_str,
         }
 
         // if mine output has RingCT, i.e., tx version is 2
-        if (mine_output && tx.version == 2)
+        if (mine_output && tx.version >= cryptonote::txversion::v2)
         {
             // cointbase txs have amounts in plain sight.
             // so use amount from ringct, only for non-coinbase txs
@@ -2399,7 +2399,7 @@ show_my_outputs(string tx_hash_str,
                 }
 
 
-                if (mine_output && mixin_tx.version == 2)
+                if (mine_output && mixin_tx.version >= cryptonote::txversion::v2)
                 {
                     // cointbase txs have amounts in plain sight.
                     // so use amount from ringct, only for non-coinbase txs
@@ -2468,11 +2468,11 @@ show_my_outputs(string tx_hash_str,
                         // in key image without spend key, so we just use all
                         // for regular/old txs there must be also a match
                         // in amounts, not only in output public keys
-                        if (mixin_tx.version < 2 && amount == in_key.amount)
+                        if (mixin_tx.version == cryptonote::txversion::v1 && amount == in_key.amount)
                         {
                             sum_mixin_xmr += amount;
                         }
-                        else if (mixin_tx.version == 2) // ringct
+                        else if (mixin_tx.version >= cryptonote::txversion::v2) // ringct
                         {
                             sum_mixin_xmr += amount;
                             ringct_amount += amount;
@@ -2687,7 +2687,6 @@ show_checkrawtx(string raw_tx_data, string action)
 
                 mstch::map tx_cd_data {
                         {"no_of_sources"      , static_cast<uint64_t>(no_of_sources)},
-                        {"use_rct"            , tx_cd.use_rct},
                         {"change_amount"      , xmreg::xmr_amount_to_str(tx_change.amount)},
                         {"has_payment_id"     , (payment_id  != null_hash)},
                         {"has_payment_id8"    , (payment_id8 != null_hash8)},
@@ -5233,7 +5232,7 @@ json_outputs(string tx_hash_str,
         }
 
         // if mine output has RingCT, i.e., tx version is 2
-        if (mine_output && tx.version == 2)
+        if (mine_output && tx.version == cryptonote::txversion::v2)
         {
             // cointbase txs have amounts in plain sight.
             // so use amount from ringct, only for non-coinbase txs
@@ -5545,14 +5544,12 @@ json_emission()
         CurrentBlockchainStatus::Emission current_values
                 = CurrentBlockchainStatus::get_emission();
 
-        string emission_blk_no   = std::to_string(current_values.blk_no - 1);
-        string emission_coinbase = xmr_amount_to_str(current_values.coinbase, "{:0.3f}");
-        string emission_fee      = xmr_amount_to_str(current_values.fee, "{:0.4f}", false);
-
         j_data = json {
                 {"blk_no"  , current_values.blk_no - 1},
-                {"coinbase", current_values.coinbase},
+                {"emission", current_values.emission},
+                {"coinbase", current_values.emission + current_values.fee},
                 {"fee"     , current_values.fee},
+                {"burn"    , current_values.burn},
         };
     }
 
@@ -5694,7 +5691,7 @@ find_our_outputs(
             }
 
             // if mine output has RingCT, i.e., tx version is 2
-            if (mine_output && tx.version == 2)
+            if (mine_output && tx.version == cryptonote::txversion::v2)
             {
                 // cointbase txs have amounts in plain sight.
                 // so use amount from ringct, only for non-coinbase txs
@@ -5941,7 +5938,7 @@ construct_tx_context(transaction tx, uint16_t with_ring_signatures = 0)
             {"with_ring_signatures"  , static_cast<bool>(
                                                with_ring_signatures)},
             {"tx_json"               , tx_json},
-            {"is_ringct"             , (tx.version > 1)},
+            {"is_ringct"             , (tx.version > cryptonote::txversion::v1)},
             {"rct_type"              , tx.rct_signatures.type},
             {"has_error"             , false},
             {"error_msg"             , string("")},
@@ -5971,11 +5968,11 @@ construct_tx_context(transaction tx, uint16_t with_ring_signatures = 0)
      context["service_node_winner"] = pod_to_hex(get_service_node_winner_from_tx_extra(tx.extra));
     
 
-    if (tx.version == transaction::version_3_per_output_unlock_times)
+    if (tx.version >= cryptonote::txversion::v3)
             {
                 tx_extra_service_node_deregister deregister;
                 tx_extra_service_node_register   register_;
-                if (tx.is_deregister_tx())
+                if (tx.type == cryptonote::txtype::deregister)
                 {
                     context["have_deregister_info"] = true;
                     if (get_service_node_deregister_from_tx_extra(tx.extra, deregister))
@@ -6465,15 +6462,7 @@ get_tx_details(const transaction& tx,
     tx_details txd;
 
     // get tx hash
-    
-    if (!tx.pruned)
-    {
-        txd.hash = get_transaction_hash(tx);
-    }
-    else
-    {
-        txd.hash = get_pruned_transaction_hash(tx, tx.prunable_hash);
-    }
+    txd.hash = get_transaction_hash(tx);
 
     // get tx public key from extra
     // this check if there are two public keys
@@ -6494,6 +6483,8 @@ get_tx_details(const transaction& tx,
 
     txd.fee = 0;
 
+    MempoolStatus::network_info current_network_info = MempoolStatus::current_network_info;
+
     if (!coinbase &&  tx.vin.size() > 0)
     {
         // check if not miner tx
@@ -6501,7 +6492,7 @@ get_tx_details(const transaction& tx,
         if (tx.vin.at(0).type() != typeid(txin_gen))
         {
             // get tx fee
-            txd.fee = get_tx_miner_fee(tx, false);
+            txd.fee = get_tx_miner_fee(tx, current_network_info.current_hf_version, false);
         }
     }
 
@@ -6535,7 +6526,7 @@ get_tx_details(const transaction& tx,
     txd.signatures = tx.signatures;
 
     // get tx version
-    txd.version = tx.version;
+    txd.version = static_cast<std::underlying_type<cryptonote::txversion>::type>(tx.version);
 
     // get unlock time
     txd.unlock_time = tx.unlock_time;
