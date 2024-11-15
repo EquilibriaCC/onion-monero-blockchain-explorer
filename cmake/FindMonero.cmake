@@ -28,7 +28,7 @@
 # (c) 2014-2016 cpp-ethereum contributors.
 #------------------------------------------------------------------------------
 
-set(LIBS common;cryptonote_basic;cryptonote_core;multisig;
+set(LIBS common;cryptonote_basic;cryptonote_core;multisig;blocks
 		cryptonote_protocol;daemonizer;mnemonics;epee;lmdb;device;
 		blockchain_db;ringct;wallet;cncrypto;easylogging;version;checkpoints;hardforks;randomx)
 
@@ -73,7 +73,7 @@ include_directories(
 		${MONERO_SOURCE_DIR}/src/crypto
 		${MONERO_SOURCE_DIR}/external
 		${MONERO_SOURCE_DIR}/external/randomxeq/src
-		${MONERO_SOURCE_DIR}/build/Linux/master/release
+		${MONERO_SOURCE_DIR}/build/Linux/master
 		${MONERO_SOURCE_DIR}/external/easylogging++
 		${MONERO_SOURCE_DIR}/contrib/epee/include
 		${MONERO_SOURCE_DIR}/external/db_drivers/liblmdb)

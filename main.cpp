@@ -1,9 +1,10 @@
 #define CROW_ENABLE_SSL
 
+#define CROW_MAIN
 
 #include "src/page.h"
 
-#include "ext/crow/crow.h"
+#include "ext/crow_all.h"
 #include "src/CmdLineOptions.h"
 #include "src/MicroCore.h"
 
@@ -17,7 +18,7 @@ using namespace std;
 
 namespace myxmr
 {
-struct jsonresponse: crow::response
+struct jsonresponse: public crow::response
 {
     jsonresponse(const nlohmann::json& _body)
             : crow::response {_body.dump()}

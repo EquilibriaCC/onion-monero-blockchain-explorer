@@ -141,7 +141,7 @@ CurrentBlockchainStatus::calculate_emission_in_blocks(
         {
           coinbase_amount += (uint64_t)0xd18c2e2800;
         }
-
+        
         vector<transaction> txs;
         vector<crypto::hash> missed_txs;
 
