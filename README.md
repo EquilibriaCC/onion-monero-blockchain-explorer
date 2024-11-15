@@ -17,7 +17,7 @@ The key features of the Onion Monero Blockchain Explorer are:
  - check oracle nodes
 
 
-## Compilation on Ubuntu 16.04/18.04
+## Compilation on Ubuntu 22.04
 
 ##### Compile latest Equilibria version
 
@@ -32,12 +32,11 @@ sudo apt install git build-essential cmake libboost-all-dev miniupnpc libunbound
 # go to home folder
 cd ~
 
-git clone --recursive https://github.com/EquilibriaCC/equilibria
+git clone https://github.com/EquilibriaCC/equilibria
 
 cd equilibria/
 
-# checkout last monero version
-git checkout -b last_release v5.0.3
+git submodule init && git submodule update
 
 make
 ```
@@ -153,18 +152,18 @@ Every 10000 blocks, the thread will save current emission in a file, by default,
 
  in `~/.bitmonero/lmdb/emission_amount.txt`. For testnet or stagenet networks,
 
- it is `~/.bitmonero/testnet/lmdb/emission_amount.txt` or `~/.bitmonero/stagenet/lmdb/emission_amount.txt`. 
- 
+ it is `~/.bitmonero/testnet/lmdb/emission_amount.txt` or `~/.bitmonero/stagenet/lmdb/emission_amount.txt`.
+
  This file is used so that we don't need to rescan entire blockchain whenever the explorer is restarted.
 
  When the explorer restarts, the thread will first check if `~/.bitmonero/lmdb/emission_amount.txt` is present, read its values, and continue from there if possible.
- 
+
  Subsequently, only the initial use of the tread is time consuming. Once the thread scans the entire blockchain, it updates the emission amount using new blocks as they come.
- 
+
  Since the explorer writes this file, there can be only one instance of it running for mainnet, testnet and stagenet.
- 
+
  Thus, for example, you cant have two explorers for mainnet running at the same time, as they will be trying to write and read the same file at the same time, leading to unexpected results.
- 
+
  Off course having one instance for mainnet and one instance for testnet is fine, as they write to different files.
 
  When the emission monitor is enabled, information about current emission of coinbase and fees is displayed on the front page, e.g., :
@@ -703,6 +702,6 @@ Example result not shown.
 Constructive criticism, code and website edits are always good. They can be made through github.
 
 
-## Originally From 
+## Originally From
 
 https://github.com/moneroexamples/onion-monero-blockchain-explorer

@@ -14,7 +14,7 @@ endif()
 
 
 if (NOT MONERO_DIR)
-    set(MONERO_DIR ~/xeqv2110)
+    set(MONERO_DIR ~/equilibria)
 endif()
 
 message(STATUS MONERO_DIR ": ${MONERO_DIR}")
