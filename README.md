@@ -27,18 +27,19 @@ Download and compile recent Equilibria into your home folder:
 # first install monero dependecines
 sudo apt update
 
-sudo apt install git build-essential cmake libboost-all-dev miniupnpc libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev libcurl4-openssl-dev libgtest-dev libreadline-dev libzmq3-dev libsodium-dev libpcsclite-dev
+sudo apt install libcurl4-openssl-dev build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev doxygen graphviz libpgm-dev qttools5-dev-tools libhidapi-dev libusb-dev libprotobuf-dev protobuf-compiler
+
 
 # go to home folder
 cd ~
 
-git clone https://github.com/EquilibriaCC/equilibria
+git clone --recursive https://github.com/EquilibriaCC/Equilibria.git equilibria
 
 cd equilibria/
 
-git submodule init && git submodule update
-
 make
+
+
 ```
 
 ##### Compile and run the explorer
@@ -51,10 +52,10 @@ as follows:
 cd ~
 
 # download the source code
-git clone https://github.com/Equilibria/Explorer
+git clone --recursive https://github.com/EquilibriaCC/Explorer.git explorer
 
 # enter the downloaded sourced code folder
-cd Explorer
+cd explorer
 
 # make a build folder and enter it
 mkdir build && cd build
