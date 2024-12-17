@@ -5,7 +5,7 @@ set(PROJECT_NAME
 
 project(${PROJECT_NAME})
 
-add_definitions(-DPTHREAD_STACK_MIN=8176)
+# add_definitions(-DPTHREAD_STACK_MIN=8176)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
